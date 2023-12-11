@@ -1,0 +1,4 @@
+repository "ping pong@micjac@cloud"
+  path "/"
+    br "/main"
+    co "/main"
