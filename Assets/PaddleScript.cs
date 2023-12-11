@@ -91,8 +91,8 @@ public class PaddleScript : MonoBehaviour
     void HandleMouseControl()
     {
         Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        Vector2 position = Vector2.MoveTowards(transform.position, mousePosition, moveSpeed * Time.deltaTime);
-        body.MovePosition(position);
+        //Vector2 position = Vector2.MoveTowards(transform.position, mousePosition, moveSpeed * Time.deltaTime);
+        body.MovePosition(mousePosition);
         if (Input.GetMouseButton(0))
         {           
             Rotate(-1);            
