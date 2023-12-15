@@ -9,6 +9,11 @@ public enum ControlType
     Gamepad,
     AI
 }
+public enum Side
+{
+    Left,
+    Right
+}
 public class PaddleScript : MonoBehaviour
 {
     //how to fix this code to work with the new input system
@@ -23,7 +28,7 @@ public class PaddleScript : MonoBehaviour
     public InputAction rotate;
     public InputAction moveX;
     public InputAction moveY;
-
+    public Rigidbody2D ball;
    
     
     
@@ -65,6 +70,7 @@ public class PaddleScript : MonoBehaviour
                 HandlePadControl();
                 break;
             case ControlType.AI:
+                HandleAIControl();
                 break;
             default:
                 break;
@@ -80,11 +86,33 @@ public class PaddleScript : MonoBehaviour
         //movement = mousePosition;
         //transform.position = mousePosition;
     }
+
+    void HandleAIControl()
+    {
+       
+        
+    }
+
+
+
+
+      
+    
+    
+    
      void HandlePadControl()
     {
         Vector2 joyStickPos = new Vector2(moveX.ReadValue<float>(), moveY.ReadValue<float>());
         Debug.Log(joyStickPos);
         joyStickPos = joyStickPos * moveSpeed * Time.fixedDeltaTime;
+        //restrict movement to left side of the screen
+        if (body.position.x + joyStickPos.x < 0)
+        {
+            joyStickPos.x = 0 - body.position.x;
+        }
+        
+
+
         body.MovePosition(body.position + joyStickPos);
         Rotate(rotate.ReadValue<float>());
     }
@@ -93,6 +121,13 @@ public class PaddleScript : MonoBehaviour
         Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         //Vector2 position = Vector2.MoveTowards(transform.position, mousePosition, moveSpeed * Time.deltaTime);
         body.MovePosition(mousePosition);
+        //restrict movement if mouse is on the right side of the screen
+
+        if (mousePosition.x > 0)
+        {
+            body.MovePosition(new Vector2(0, mousePosition.y));
+        }
+        //
         if (Input.GetMouseButton(0))
         {           
             Rotate(-1);            
@@ -102,6 +137,7 @@ public class PaddleScript : MonoBehaviour
             Rotate(1);    
         }
     }
+    
 
     public void Move(Vector2 direction)
     {

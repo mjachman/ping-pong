@@ -1,0 +1,11 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/MenuStyles.uss?fileID=7433441132597879392&amp;guid=a4990c2a5830af0458b22b8cee72a01a&amp;type=3#MenuStyles" />
+    <ui:VisualElement name="Screen" style="flex-grow: 1;">
+        <ui:Label tabindex="-1" text="PING PONG 2D" parse-escape-sequences="true" display-tooltip-when-elided="true" style="align-self: center; justify-content: flex-start; -unity-font-style: bold; font-size: 215%; -unity-text-outline-width: 9px; color: rgb(255, 249, 249); -unity-text-outline-color: rgb(0, 0, 0);" />
+        <ui:VisualElement name="Buttons" style="flex-grow: 1; align-items: center; justify-content: center; height: 50%;">
+            <ui:Button text="GRAJ" parse-escape-sequences="true" display-tooltip-when-elided="true" name="PlayButton" class="menu-button" style="-unity-text-align: middle-center;" />
+            <ui:Button text="USTAWIENIA" parse-escape-sequences="true" display-tooltip-when-elided="true" name="SettingsButton" class="menu-button" />
+            <ui:Button text="WYJDŹ" parse-escape-sequences="true" display-tooltip-when-elided="true" name="QuitButton" class="menu-button" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

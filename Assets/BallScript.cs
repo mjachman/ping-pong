@@ -17,6 +17,7 @@ public class BallScript : MonoBehaviour
     public string lastHit;
     List<String> hits;
     // Start is called before the first frame update
+
     void Start()
     {
         hits = new List<String>();
