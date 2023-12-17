@@ -7,14 +7,14 @@ public class GameLogic : MonoBehaviour
 {
     public int p1Score;
     public int p2Score;
-    public int servingPlayer;
+    //public int servingPlayer;
     public int lastHit;
-    public Vector2 servePosition=new Vector2(-14,-3);
+    public Vector2 servePosition = new Vector2(-14, -3);
     public float serveSpeed = 5;
     public TextMeshProUGUI p1ScoreText;
     public TextMeshProUGUI p2ScoreText;
-    public TextMeshProUGUI p1sets,p2sets;
-  
+    public TextMeshProUGUI p1sets, p2sets;
+
     public GameObject ball;
     public GameObject TableTop;
     public AudioSource audioPlayer;
@@ -26,6 +26,13 @@ public class GameLogic : MonoBehaviour
     public int p1SetScore = 0;
     public int p2SetScore = 0;
     public int sets = 3;
+
+    public PaddleScript paddle1;
+    public PaddleScript paddle2;
+
+    public PaddleScript servingPaddle;
+
+    public int servingPlayer;
 
     public GameObject newGameButon;
 
@@ -58,18 +65,37 @@ public class GameLogic : MonoBehaviour
         endSet();
 
         int totalScore = p1Score + p2Score;
-        
-        if (totalScore >= 20 || (totalScore % 2 == 0 && totalScore != 0) )
+
+        if (totalScore >= 20 || (totalScore % 2 == 0 && totalScore != 0))
         {
+            SwitchServingPaddle();
             servingPlayer = -servingPlayer;
             servePosition.x = -servePosition.x;
         }
     }
+    public void SwitchServingPaddle()
+    {
+        if (servingPaddle == paddle1)
+        {
+            servingPaddle = paddle2;
+            paddle1.serving = false;
+            paddle2.serving = true;
+            
+        }
+        else if (servingPaddle == paddle2)
+        {
+            servingPaddle = paddle1;
+            paddle1.serving = true;
+            paddle2.serving = false;
+            
+        }
+    }
+
     public void endSet()
     {
         if (p1Score >= 11 || p2Score >= 11)
         {
-            if (Mathf.Abs(p1Score-p2Score)>=2)
+            if (Mathf.Abs(p1Score - p2Score) >= 2)
             {
                 if (p1Score > p2Score)
                 {
@@ -86,7 +112,7 @@ public class GameLogic : MonoBehaviour
                     p2SetScore++;
                     p2sets.text += "I";
                 }
-                
+
                 if (p1SetScore == sets)
                 {
                     winnerText.text = "Gracz 1 wygrywa mecz!";
@@ -128,16 +154,26 @@ public class GameLogic : MonoBehaviour
         return false;
     }
 
-    
+
     // Start is called before the first frame update
     void Start()
     {
         //animator.enabled = true;
         newGameButon.SetActive(false);
+        paddle1.ControlType = (ControlType)PlayerPrefs.GetInt("Player1Controls");
+        paddle2.ControlType = (ControlType)PlayerPrefs.GetInt("Player2Controls");
+        paddle1.side = Side.Left;
+        paddle2.side = Side.Right;
+        //paddle2.ControlType = ControlType.AI;
+
         p1Score = 0;
         p2Score = 0;
+        servingPaddle = paddle1;
+        paddle1.serving = true;
         servingPlayer = 1;
     }
+
+
 
     // Update is called once per frame
     void Update()

@@ -2,8 +2,8 @@
     <Style src="project://database/Assets/MenuStyles.uss?fileID=7433441132597879392&amp;guid=a4990c2a5830af0458b22b8cee72a01a&amp;type=3#MenuStyles" />
     <ui:Label tabindex="-1" text="USTAWIENIA" parse-escape-sequences="true" display-tooltip-when-elided="true" style="align-self: center; justify-content: flex-start; -unity-font-style: bold; font-size: 136%; -unity-text-outline-width: 9px; color: rgb(255, 249, 249); -unity-text-outline-color: rgb(0, 0, 0); margin-top: 33px;" />
     <ui:VisualElement name="Buttons" style="flex-grow: 1; align-items: center; justify-content: center; height: 50%;">
-        <ui:RadioButtonGroup label="GRACZ 1" value="-1" choices="MYSZ,PAD,KOMPUTER" class="radio" style="align-items: flex-start; justify-content: flex-start;" />
-        <ui:RadioButtonGroup label="GRACZ 2" value="-1" choices="MYSZ,PAD,KOMPUTER" class="radio" style="margin-top: 54px; margin-right: 54px; margin-bottom: 54px; margin-left: 54px;" />
+        <ui:RadioButtonGroup label="GRACZ 1" value="-1" choices="MYSZ,PAD,KOMPUTER" name="Player1Settings" class="radio" style="align-items: flex-start; justify-content: flex-start;" />
+        <ui:RadioButtonGroup label="GRACZ 2" value="-1" choices="MYSZ,PAD,KOMPUTER" name="Player2Settings" class="radio" style="margin-top: 54px; margin-right: 54px; margin-bottom: 54px; margin-left: 54px;" />
         <ui:Button text="WRÓĆ" parse-escape-sequences="true" display-tooltip-when-elided="true" name="BackButton" class="menu-button" />
     </ui:VisualElement>
 </ui:UXML>

@@ -20,6 +20,7 @@ public class BallScript : MonoBehaviour
 
     void Start()
     {
+
         hits = new List<String>();
         init = transform.position;
         serving = true;
@@ -49,7 +50,7 @@ public class BallScript : MonoBehaviour
 
         if (serving)
         {
-            ServeBall();
+            ResetBall();
         }
 
         if (hits.Count >= 3 && !play)
@@ -259,25 +260,26 @@ public class BallScript : MonoBehaviour
         yield return new WaitForSeconds(2f);
         ServeBall();
     }
-    private void ServeBall()
-    {
-        //body.velocity = Vector2.zero;
-        //Physics.IgnoreCollision(GetComponent<Collider>(), other, false);
-        
+    private void ResetBall(){
         GetComponent<Collider2D>().enabled = false;
         trailRenderer.GetComponent<TrailRenderer>().enabled = false;
         trailRenderer.GetComponent<TrailRenderer>().Clear();
         transform.position = gameLogic.servePosition;
         body.constraints = RigidbodyConstraints2D.FreezePosition;
-        if (Input.GetKey(KeyCode.Space))
-        {
+    }
+
+    public void ServeBall()
+    {
+        Debug.Log("serve");
+        //body.velocity = Vector2.zero;
+        //Physics.IgnoreCollision(GetComponent<Collider>(), other, false);
             GetComponent<Collider2D>().enabled = true;
             body.constraints = RigidbodyConstraints2D.None;
             body.velocity = Vector2.up * gameLogic.serveSpeed;
             //trailRenderer.GetComponent<TrailRenderer>().Clear();
             trailRenderer.GetComponent<TrailRenderer>().enabled = true;
             serving = false;
-        }
+        
     }
     public void OnCollisionEnter2D(Collision2D collision)
     {

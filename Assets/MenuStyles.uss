@@ -27,6 +27,7 @@
     border-right-color: rgba(0, 124, 176, 0.97);
     border-top-color: rgba(0, 124, 176, 0.97);
     border-bottom-color: rgba(0, 124, 176, 0.97);
+    transition: transform 0.3s ease-in-out;
 }
 
 .menu-button:hover {
@@ -47,3 +48,12 @@
     -unity-text-outline-color: rgb(0, 0, 0);
     -unity-text-align: upper-right;
 }
+.radio:active {
+    color: rgb(255, 255, 255); /* Set this to the original color of the title */
+}
+
+.unity-base-field:focus > .unity-base-field__label {
+    color: white;
+}
+
+
