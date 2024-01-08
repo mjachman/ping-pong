@@ -124,6 +124,7 @@ public class GameLogic : MonoBehaviour
                     winnerText.text = "Gracz 2 wygrywa mecz!";
                     audioPlayer.clip = chant;
                     newGameButon.SetActive(true);
+                    
                 }
                 else
                 {

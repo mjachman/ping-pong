@@ -14,8 +14,8 @@ public class BallScript : MonoBehaviour
     public float maxSpeed = 10;
     public TrailRenderer trailRenderer;
     public GameLogic gameLogic;
-    public string lastHit;
-    List<String> hits;
+    // public string lastHit;
+    public List<String> hits;
     // Start is called before the first frame update
 
     void Start()
@@ -181,8 +181,6 @@ public class BallScript : MonoBehaviour
                     Debug.Log("FAUL! Gracz 2 nie odebral pi?eczki");
                 }
             }
-
-
             resetRound();
 
         }
@@ -255,11 +253,7 @@ public class BallScript : MonoBehaviour
 
     }
 
-    public IEnumerator InvokeServe()
-    {
-        yield return new WaitForSeconds(2f);
-        ServeBall();
-    }
+  
     private void ResetBall(){
         GetComponent<Collider2D>().enabled = false;
         trailRenderer.GetComponent<TrailRenderer>().enabled = false;
@@ -270,7 +264,7 @@ public class BallScript : MonoBehaviour
 
     public void ServeBall()
     {
-        Debug.Log("serve");
+        serving = false;
         //body.velocity = Vector2.zero;
         //Physics.IgnoreCollision(GetComponent<Collider>(), other, false);
             GetComponent<Collider2D>().enabled = true;
@@ -278,7 +272,7 @@ public class BallScript : MonoBehaviour
             body.velocity = Vector2.up * gameLogic.serveSpeed;
             //trailRenderer.GetComponent<TrailRenderer>().Clear();
             trailRenderer.GetComponent<TrailRenderer>().enabled = true;
-            serving = false;
+            
         
     }
     public void OnCollisionEnter2D(Collision2D collision)
