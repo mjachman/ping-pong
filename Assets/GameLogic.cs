@@ -25,7 +25,8 @@ public class GameLogic : MonoBehaviour
 
     public int p1SetScore = 0;
     public int p2SetScore = 0;
-    public int sets = 3;
+    public int sets = 1;
+    public int pointsToWin = 2;
 
     public PaddleScript paddle1;
     public PaddleScript paddle2;
@@ -35,6 +36,8 @@ public class GameLogic : MonoBehaviour
     public int servingPlayer;
 
     public GameObject newGameButon;
+
+    public PauseMenu pauseMenu;
 
     public void addScore(int player)
     {
@@ -93,7 +96,7 @@ public class GameLogic : MonoBehaviour
 
     public void endSet()
     {
-        if (p1Score >= 11 || p2Score >= 11)
+        if (p1Score >= pointsToWin || p2Score >= pointsToWin)
         {
             if (Mathf.Abs(p1Score - p2Score) >= 2)
             {
@@ -117,12 +120,16 @@ public class GameLogic : MonoBehaviour
                 {
                     winnerText.text = "Gracz 1 wygrywa mecz!";
                     audioPlayer.clip = chant;
+                    Time.timeScale = 0;
+                    //stop time
+
                     newGameButon.SetActive(true);
                 }
                 else if (p2SetScore == sets)
                 {
                     winnerText.text = "Gracz 2 wygrywa mecz!";
                     audioPlayer.clip = chant;
+                    Time.timeScale = 0;
                     newGameButon.SetActive(true);
                     
                 }
@@ -138,6 +145,7 @@ public class GameLogic : MonoBehaviour
     }
     public void resetGame()
     {
+        Time.timeScale=1;
         newGameButon.SetActive(false);
         resetScore();
         p1SetScore = 0;
