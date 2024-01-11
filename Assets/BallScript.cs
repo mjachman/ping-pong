@@ -142,7 +142,7 @@ public class BallScript : MonoBehaviour
             }
 
         }
-        if (transform.position.y < -13)
+        if (transform.position.y < -13 || transform.position.y > 35 || transform.position.x < -26 || transform.position.x > 26)
         {
             if (!play)
             {

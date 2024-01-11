@@ -8,7 +8,8 @@ public enum ControlType
 {
     Mouse,
     Gamepad,
-    AI
+    AI,
+    None
 }
 public enum Side
 {
@@ -34,13 +35,16 @@ public class PaddleScript : MonoBehaviour
     public bool serving;
 
     public float tableBounciness = 0.7f;
+
+    public float targetBallSpeed = 10f;
     public float directionEasing = 100f;
 
+    public float aimHeight = -3f;
 
 
     public Side side;
 
-
+    private float dragCoefficient; // Adjust as needed
 
     // Start is called before the first frame update
     void Start()
@@ -52,6 +56,8 @@ public class PaddleScript : MonoBehaviour
         body = GetComponent<Rigidbody2D>();
 
         Debug.Log(body.name);
+
+        dragCoefficient = ball.GetComponent<Rigidbody2D>().drag;
 
     }
     private void OnEnable()
@@ -85,6 +91,8 @@ public class PaddleScript : MonoBehaviour
                 break;
             case ControlType.AI:
                 HandleAIControl();
+                break;
+            case ControlType.None:
                 break;
             default:
                 break;
@@ -150,38 +158,64 @@ public class PaddleScript : MonoBehaviour
 
     void Strike()
     {
-        float speed = 5f;
         Vector3 difference = strikePosition - ball.transform.position;
         float magnitude = difference.magnitude;
-        float flightTime = magnitude / speed;
-        Vector3 targetBallVelocity = new Vector3(difference.x / flightTime, difference.y / flightTime + 0.5f * Physics2D.gravity.y * flightTime * flightTime, 0f);
+        float flightTime = magnitude / targetBallSpeed;
+
+        // Apply a basic drag adjustment to the target velocity
+        Vector3 targetBallVelocity = new Vector3(difference.x / flightTime, difference.y / flightTime + 0.5f * Physics2D.gravity.y * flightTime * flightTime, 0f) * (1 - dragCoefficient);
+
         Vector3 initialBallVelocity = ball.GetComponent<Rigidbody2D>().velocity;
         Vector3 targetPaddleVelocity = targetBallVelocity - initialBallVelocity;
+
         aiSpeed = targetPaddleVelocity.magnitude;
         SetTarget(ball.transform.position);
     }
 
-    float CalculateTime(float velocity, float acceleration, float distance)
+
+    float CalculateTimeWithDrag(float initialVelocity, float acceleration, float distance, float dragCoefficient)
     {
-        float discriminant = velocity * velocity + 2 * acceleration * distance;
-        if (discriminant < 0)
+        float deltaTime = 0.02f; // Small time step for the simulation, adjust as needed
+        float elapsed = 0f; // Time elapsed
+        float velocity = initialVelocity;
+        float traveledDistance = 0f;
+
+        while (true)
         {
-            return -1f; // Return a negative value to indicate an error
+            // Update position and time
+            traveledDistance += velocity * deltaTime;
+            elapsed += deltaTime;
+
+            // Check if the target distance has been reached or exceeded
+            if ((initialVelocity >= 0 && traveledDistance >= distance) ||
+                (initialVelocity < 0 && traveledDistance <= distance))
+            {
+                break;
+            }
+
+            // Apply drag and acceleration to the velocity
+            velocity *= (1 - dragCoefficient * deltaTime);
+            velocity += acceleration * deltaTime;
+
+            // Break if velocity becomes too low, indicating it won't reach the target
+            if (Mathf.Abs(velocity) < 0.001f)
+            {
+                break;
+            }
+
+            // Safety check to avoid infinite loops
+            if (elapsed > 5)
+            { // Arbitrary large number for timeout
+                Debug.LogError("CalculateTimeWithDrag: Timeout - loop ran too long");
+                return -1f;
+            }
         }
 
-        float time1 = (-velocity + Mathf.Sqrt(discriminant)) / acceleration;
-        float time2 = (-velocity - Mathf.Sqrt(discriminant)) / acceleration;
-
-        // Return the smaller positive time value, or a negative value if both times are negative
-        if (time1 >= 0 && time2 >= 0)
-            return Mathf.Min(time1, time2);
-        else if (time1 >= 0)
-            return time1;
-        else if (time2 >= 0)
-            return time2;
-        else
-            return -1f;
+        return elapsed;
     }
+
+
+
 
     bool IsBallApproaching()
     {
@@ -197,8 +231,38 @@ public class PaddleScript : MonoBehaviour
         return true;
     }
 
+    Vector2 CalculateVelocityWithDrag(Vector2 initialVelocity, float drag, float deltaTime)
+    {
+        // Euler's method to approximate velocity under drag
+        return initialVelocity * (1 - drag * deltaTime);
+    }
+
+    Vector3 CalculatePositionWithDrag(Vector3 initialPosition, Vector2 initialVelocity, float drag, float timeToReach, float gravity)
+    {
+        Vector3 position = initialPosition;
+        Vector2 velocity = initialVelocity;
+        float deltaTime = 0.02f; // Small time step, adjust as needed
+
+        for (float t = 0; t < timeToReach; t += deltaTime)
+        {
+            // Update position
+            position += new Vector3(velocity.x, velocity.y, 0) * deltaTime;
+            // Update velocity for drag
+            velocity = CalculateVelocityWithDrag(velocity, drag, deltaTime);
+            // Apply gravity
+            velocity.y += gravity * deltaTime;
+        }
+
+        return position;
+    }
+
     Vector3 AdjustLookAt(Vector3 currentLookAt, Vector2 ballVelocity)
     {
+        if (Mathf.Abs(directionEasing) < 0.001f)
+        {
+            return currentLookAt;
+        }
+
         // Calculate the trajectory angle of the ball
         float trajectoryAngle = Mathf.Atan2(ballVelocity.y, ballVelocity.x) * Mathf.Rad2Deg;
 
@@ -210,6 +274,46 @@ public class PaddleScript : MonoBehaviour
 
         return new Vector3(currentLookAt.x, currentLookAt.y + adjustment, currentLookAt.z);
     }
+
+    float CalculateHighestPoint(Vector2 initialVelocity, float gravity, float drag, float initialY)
+    {
+        Vector2 velocity = initialVelocity;
+        float yPosition = initialY;
+        float deltaTime = 0.02f; // Small time step, adjust as needed
+
+        while (velocity.y > 0)
+        {
+            // Update position
+            yPosition += velocity.y * deltaTime;
+            // Apply gravity
+            velocity.y += gravity * deltaTime;
+            // Apply drag
+            velocity.y *= (1 - drag * deltaTime);
+        }
+
+        return yPosition;
+    }
+
+    Vector2 CalculateVelocityWithDrag(Vector2 initialVelocity, float gravity, float dragCoefficient, float timeToReach)
+    {
+        float deltaTime = 0.02f; // Small time step, adjust as needed
+        Vector2 velocity = initialVelocity;
+        float elapsedTime = 0f;
+
+        while (elapsedTime < timeToReach)
+        {
+            // Apply drag to the velocity
+            velocity *= (1 - dragCoefficient * deltaTime);
+            // Apply gravity to the vertical component of the velocity
+            velocity.y += gravity * deltaTime;
+            // Update elapsed time
+            elapsedTime += deltaTime;
+        }
+
+        return velocity;
+    }
+
+
     bool adjust = false;
 
     void HandleAIControl()
@@ -227,10 +331,10 @@ public class PaddleScript : MonoBehaviour
                 if (ball.GetComponent<BallScript>().serving && serving)
                 {
                     aiState = AIState.PrepareServe;
-                    SetTarget(servePosition + (side == Side.Right ? new Vector2(2f, 1.5f) : new Vector2(-2f, 1.5f)));
+                    SetTarget(servePosition + (side == Side.Right ? new Vector2(2f, 2f) : new Vector2(-2f, 2f)));
                     break;
                 }
-                
+
                 if (!IsBallApproaching() || ball.GetComponent<Rigidbody2D>().velocity.y >= -0.1f)
                 {
                     break;
@@ -244,43 +348,51 @@ public class PaddleScript : MonoBehaviour
 
                 // Calculate the time to reach table
                 float tableY = -5f;
-                float timeToReachTable = CalculateTime(initialVelocity.y, gravity, tableY - initialPosition.y);
+                float timeToReachTable = CalculateTimeWithDrag(initialVelocity.y, gravity, tableY - initialPosition.y, dragCoefficient);
                 if (timeToReachTable < 0)
                 {
-                    Debug.Log("Time to reach table is negative");
+                    Debug.LogWarning("Time to reach table is negative");
                     break;
                 }
-                Vector3 positionAtTable = new Vector3(initialPosition.x + initialVelocity.x * timeToReachTable, tableY, 0f);
+                // Vector3 positionAtTable = new Vector3(initialPosition.x + initialVelocity.x * timeToReachTable, tableY, 0f);
+                Vector3 positionAtTable = CalculatePositionWithDrag(initialPosition, initialVelocity, dragCoefficient, timeToReachTable, gravity);
 
                 if ((side == Side.Right && positionAtTable.x > 14f) || (side == Side.Left && positionAtTable.x < -14f))
                 {
-                    Debug.Log("Ball will not reach table");
+                    Debug.LogWarning("Ball will not reach table");
                     break;
                 }
-                Vector2 velocityAtTable = new Vector2(initialVelocity.x * tableBounciness, (initialVelocity.y + gravity * timeToReachTable) * tableBounciness);
+                // Vector2 velocityAtTable = new Vector2(initialVelocity.x * tableBounciness, (initialVelocity.y + gravity * timeToReachTable) * tableBounciness);
+                // Vector2 velocityAtTable = new Vector2(initialVelocity.x * tableBounciness, -(initialVelocity.y + gravity * timeToReachTable) * tableBounciness);
+
+                Vector2 velocityAtTable = CalculateVelocityWithDrag(initialVelocity, gravity, dragCoefficient, timeToReachTable);
+                velocityAtTable = new Vector2(velocityAtTable.x * tableBounciness, -velocityAtTable.y * tableBounciness);
 
                 // Assuming the ball bounces and moves upwards
-                float desiredY = tableY + (velocityAtTable.y * velocityAtTable.y) / (2 * -gravity);
+                // float desiredY = tableY + (velocityAtTable.y * velocityAtTable.y) / (2 * -gravity);
+                float desiredY = CalculateHighestPoint(velocityAtTable, gravity, dragCoefficient, tableY) - 0.1f;
 
                 Debug.Log("DesiredY: " + desiredY);
                 Debug.Log("velocityAtTable: " + velocityAtTable);
 
                 // Calculate the time to reach the desired y position
                 // This time, we consider the motion starting from targetY to desiredY
-                float timeToDesiredY = CalculateTime(-velocityAtTable.y, gravity, desiredY - positionAtTable.y);
+                float timeToDesiredY = CalculateTimeWithDrag(velocityAtTable.y, gravity, desiredY - positionAtTable.y, dragCoefficient);
+                Debug.Log("Time to desired y: " + timeToDesiredY);
+
                 if (timeToDesiredY < 0)
                 {
-                    Debug.Log("Time to desired y is negative");
+                    Debug.LogWarning("Time to desired y is negative");
                     break;
                 }
-                Vector3 positionAtDesired = new Vector3(positionAtTable.x + velocityAtTable.x * timeToDesiredY, desiredY, 0f);
+                // Vector3 positionAtDesired = new Vector3(positionAtTable.x + velocityAtTable.x * timeToDesiredY, desiredY, 0f);
+                Vector3 positionAtDesired = CalculatePositionWithDrag(positionAtTable, velocityAtTable, dragCoefficient, timeToDesiredY, gravity);
 
-                Debug.Log("Time to desired y: " + timeToDesiredY);
                 Debug.Log("positionAtDesired: " + positionAtDesired);
 
-                strikePosition = new Vector3(0f, -3f, 0f);
-                SetTarget(new Vector3(positionAtDesired.x, desiredY, 0f));
-                waitUntil = Time.timeSinceLevelLoad + timeToReachTable + timeToDesiredY;
+                strikePosition = side == Side.Right ? new Vector3(-6f, aimHeight, 0f) : new Vector3(6f, aimHeight, 0f);
+                SetTarget(new Vector3(positionAtDesired.x, desiredY - 0.4f, 0f));
+                waitUntil = Time.timeSinceLevelLoad + timeToReachTable + timeToDesiredY - 0.3f;
                 aiState = AIState.WaitStrike;
                 adjust = true;
 

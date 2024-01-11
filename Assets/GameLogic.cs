@@ -25,8 +25,8 @@ public class GameLogic : MonoBehaviour
 
     public int p1SetScore = 0;
     public int p2SetScore = 0;
-    public int sets = 1;
-    public int pointsToWin = 2;
+    public int sets = 3;
+    public int pointsToWin = 11;
 
     public PaddleScript paddle1;
     public PaddleScript paddle2;
@@ -120,7 +120,9 @@ public class GameLogic : MonoBehaviour
                 {
                     winnerText.text = "Gracz 1 wygrywa mecz!";
                     audioPlayer.clip = chant;
-                    Time.timeScale = 0;
+                    //Time.timeScale = 0;
+                    paddle1.ControlType = ControlType.None;
+                    paddle2.ControlType = ControlType.None;
                     //stop time
 
                     newGameButon.SetActive(true);
@@ -129,7 +131,9 @@ public class GameLogic : MonoBehaviour
                 {
                     winnerText.text = "Gracz 2 wygrywa mecz!";
                     audioPlayer.clip = chant;
-                    Time.timeScale = 0;
+                    paddle1.ControlType = ControlType.None;
+                    paddle2.ControlType = ControlType.None;
+                    //Time.timeScale = 0;
                     newGameButon.SetActive(true);
                     
                 }
@@ -145,7 +149,8 @@ public class GameLogic : MonoBehaviour
     }
     public void resetGame()
     {
-        Time.timeScale=1;
+        paddle1.ControlType = (ControlType)PlayerPrefs.GetInt("Player1Controls");
+        paddle2.ControlType = (ControlType)PlayerPrefs.GetInt("Player2Controls");
         newGameButon.SetActive(false);
         resetScore();
         p1SetScore = 0;
@@ -156,7 +161,7 @@ public class GameLogic : MonoBehaviour
 
     public bool endGame()
     {
-        if (p1SetScore == 3 || p2SetScore == 3)
+        if (p1SetScore == sets || p2SetScore == sets)
         {
             return true;
         }

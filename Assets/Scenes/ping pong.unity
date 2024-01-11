@@ -331,7 +331,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 998}
+  m_AnchoredPosition: {x: 0, y: 932}
   m_SizeDelta: {x: 602.5, y: 224.10004}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &63501116
@@ -496,11 +496,13 @@ MonoBehaviour:
   p1SetScore: 0
   p2SetScore: 0
   sets: 3
+  pointsToWin: 11
   paddle1: {fileID: 1457525818}
   paddle2: {fileID: 1962127247}
   servingPaddle: {fileID: 0}
   servingPlayer: 0
   newGameButon: {fileID: 1211981782}
+  pauseMenu: {fileID: 84478524}
 --- !u!1 &191481063
 GameObject:
   m_ObjectHideFlags: 0
@@ -728,7 +730,7 @@ Transform:
   m_GameObject: {fileID: 480937360}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.606, y: -3.088, z: 0}
+  m_LocalPosition: {x: 0.08, y: 33.58, z: 0}
   m_LocalScale: {x: 0.426659, y: 0.426659, z: 0.426659}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -747,7 +749,7 @@ Rigidbody2D:
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
   m_Mass: 22.73
-  m_LinearDrag: 0.5
+  m_LinearDrag: 0.3
   m_AngularDrag: 0.49
   m_GravityScale: 1
   m_Material: {fileID: 0}
@@ -1904,11 +1906,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9768790981f49544e9c9639f987d090a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ControlType: 1
+  ControlType: 2
   rotationSpeed: 200
   maxSpeed: 9
   body: {fileID: 1457525819}
-  moveSpeed: 10
+  moveSpeed: 20
   rotate:
     m_Name: Rotate
     m_Type: 0
@@ -1995,7 +1997,10 @@ MonoBehaviour:
     m_Flags: 0
   ball: {fileID: 480937360}
   serving: 0
-  tableBounciness: 0.45
+  tableBounciness: 0.9
+  targetBallSpeed: 9
+  directionEasing: 0
+  aimHeight: -4
   side: 0
 --- !u!50 &1457525819
 Rigidbody2D:
@@ -2222,19 +2227,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4008889711538278247, guid: ceb7dc67ec6380e439cfeba72d0f290a, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4008889711538278247, guid: ceb7dc67ec6380e439cfeba72d0f290a, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4008889711538278247, guid: ceb7dc67ec6380e439cfeba72d0f290a, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4008889711538278247, guid: ceb7dc67ec6380e439cfeba72d0f290a, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 4008889711538278247, guid: ceb7dc67ec6380e439cfeba72d0f290a, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -2242,7 +2247,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4008889711538278247, guid: ceb7dc67ec6380e439cfeba72d0f290a, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -0.000061035156
       objectReference: {fileID: 0}
     - target: {fileID: 4008889711538278247, guid: ceb7dc67ec6380e439cfeba72d0f290a, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -2254,7 +2259,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4008889711538278247, guid: ceb7dc67ec6380e439cfeba72d0f290a, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
+      value: -180
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2371,6 +2376,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 29057042}
     m_Modifications:
+    - target: {fileID: 1050528919987469538, guid: e7c294859d5f7dc46b56e23d0eb96075, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 936
+      objectReference: {fileID: 0}
+    - target: {fileID: 4017550833454725696, guid: e7c294859d5f7dc46b56e23d0eb96075, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 26.516882
+      objectReference: {fileID: 0}
     - target: {fileID: 4410084994739966533, guid: e7c294859d5f7dc46b56e23d0eb96075, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
       value: 1
@@ -2510,6 +2523,10 @@ PrefabInstance:
     - target: {fileID: 8428711023397410496, guid: e7c294859d5f7dc46b56e23d0eb96075, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 8766942183002245774, guid: e7c294859d5f7dc46b56e23d0eb96075, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 936
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -3016,21 +3033,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9768790981f49544e9c9639f987d090a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ControlType: 1
-  rotationSpeed: 120
+  ControlType: 2
+  rotationSpeed: 200
   maxSpeed: 9
-  body: {fileID: 0}
-  moveSpeed: 10
+  body: {fileID: 1457525819}
+  moveSpeed: 20
   rotate:
     m_Name: Rotate
     m_Type: 0
     m_ExpectedControlType: 
-    m_Id: 5c28e7ea-211b-420d-8acd-cfc6816606e8
+    m_Id: a7deb34d-ea48-4392-a806-6500778c478a
     m_Processors: 
     m_Interactions: 
     m_SingletonActionBindings:
     - m_Name: 1D Axis
-      m_Id: 43a1ec8b-965f-4b01-b59e-12ac9c82e2bf
+      m_Id: 3c1ea51f-9135-4d21-a0d9-f3c9a571f6e9
       m_Path: 1DAxis
       m_Interactions: 
       m_Processors: 
@@ -3038,7 +3055,7 @@ MonoBehaviour:
       m_Action: Rotate
       m_Flags: 4
     - m_Name: negative
-      m_Id: 6b182d79-70f3-4082-bd1e-520cecf75dae
+      m_Id: cd791c2d-f0d6-4e2a-9e2f-fc9a104d67f2
       m_Path: <Gamepad>/leftShoulder
       m_Interactions: 
       m_Processors: 
@@ -3046,7 +3063,7 @@ MonoBehaviour:
       m_Action: Rotate
       m_Flags: 8
     - m_Name: positive
-      m_Id: a4319ab9-6212-4b32-be87-a7eec9c18122
+      m_Id: 43efc304-a91b-4c44-a13c-00c320b883ce
       m_Path: <Gamepad>/rightShoulder
       m_Interactions: 
       m_Processors: 
@@ -3058,12 +3075,12 @@ MonoBehaviour:
     m_Name: Move X
     m_Type: 0
     m_ExpectedControlType: 
-    m_Id: 625a11f0-8ee3-4e0e-a94b-22b5740106e2
+    m_Id: 39c37438-6e9b-4dde-8f39-8e6329104fcc
     m_Processors: 
     m_Interactions: 
     m_SingletonActionBindings:
     - m_Name: 
-      m_Id: aa7f37d7-7bd0-40e3-a14e-3ec286014d35
+      m_Id: a380fbe1-ee93-4793-b147-1e04d0ad2034
       m_Path: <Gamepad>/leftStick/x
       m_Interactions: 
       m_Processors: 
@@ -3075,12 +3092,12 @@ MonoBehaviour:
     m_Name: Move Y
     m_Type: 0
     m_ExpectedControlType: 
-    m_Id: 4650f7fa-527d-4574-851c-621ddc1c87a8
+    m_Id: 2ef10140-6fcb-461b-9538-ee33aefa5356
     m_Processors: 
     m_Interactions: 
     m_SingletonActionBindings:
     - m_Name: 
-      m_Id: ba223260-da59-4775-be35-f8bbf60205db
+      m_Id: 94bd272e-8c02-42f3-8cd5-b9925500f3c3
       m_Path: <Gamepad>/leftStick/y
       m_Interactions: 
       m_Processors: 
@@ -3092,12 +3109,12 @@ MonoBehaviour:
     m_Name: Serve
     m_Type: 0
     m_ExpectedControlType: 
-    m_Id: a55b6185-3df1-4478-9a82-f901748dca88
+    m_Id: f84eb75c-57f1-46a5-9f52-30751cfcc459
     m_Processors: 
     m_Interactions: 
     m_SingletonActionBindings:
     - m_Name: 
-      m_Id: f275a95b-852a-4dfd-91ac-273baab879ec
+      m_Id: f635aa37-7273-48c2-8295-a988fbf60694
       m_Path: <Gamepad>/buttonSouth
       m_Interactions: 
       m_Processors: 
@@ -3107,8 +3124,11 @@ MonoBehaviour:
     m_Flags: 0
   ball: {fileID: 480937360}
   serving: 0
-  tableBounciness: 0.45
-  side: 1
+  tableBounciness: 0.9
+  targetBallSpeed: 9
+  directionEasing: 0
+  aimHeight: -4
+  side: 0
 --- !u!1 &2061769178
 GameObject:
   m_ObjectHideFlags: 0
